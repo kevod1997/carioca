@@ -1,0 +1,11 @@
+-- AlterTable
+ALTER TABLE "Game" ADD COLUMN     "winnerId" INTEGER;
+
+-- AlterTable
+ALTER TABLE "Player" ADD COLUMN     "completedGames" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "totalGames" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "totalPoints" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "totalVictories" INTEGER NOT NULL DEFAULT 0;
+
+-- AddForeignKey
+ALTER TABLE "Game" ADD CONSTRAINT "Game_winnerId_fkey" FOREIGN KEY ("winnerId") REFERENCES "Player"("id") ON DELETE SET NULL ON UPDATE CASCADE;

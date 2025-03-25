@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Game {
+  id               Int               @id @default(autoincrement())
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  name             String?
+  isActive         Boolean           @default(true)
+  completedAt      DateTime?
+  winnerId         Int? // ID del jugador ganador
+  gameParticipants GameParticipant[]
+  rounds           Round[]
+  winner           Player?           @relation("GameWins", fields: [winnerId], references: [id])
+}
+
+model Player {
+  id             Int               @id @default(autoincrement())
+  name           String            @unique
+  createdAt      DateTime          @default(now())
+  gamesWon       Game[]            @relation("GameWins")
+  totalGames     Int               @default(0) // Total de partidas jugadas
+  completedGames Int               @default(0) // Partidas completadas
+  totalVictories Int               @default(0) // Número de victorias
+  totalPoints    Int               @default(0) // Puntos acumulados en partidas completadas
+  participations GameParticipant[]
+}
+
+model GameParticipant {
+  id       Int     @id @default(autoincrement())
+  playerId Int
+  gameId   Int
+  player   Player  @relation(fields: [playerId], references: [id])
+  game     Game    @relation(fields: [gameId], references: [id])
+  scores   Score[]
+
+  @@unique([playerId, gameId])
+}
+
+model Round {
+  id          Int     @id @default(autoincrement())
+  roundNumber Int
+  gameId      Int
+  game        Game    @relation(fields: [gameId], references: [id])
+  scores      Score[]
+}
+
+model Score {
+  id            Int             @id @default(autoincrement())
+  value         Int
+  participantId Int
+  roundId       Int
+  participant   GameParticipant @relation(fields: [participantId], references: [id])
+  round         Round           @relation(fields: [roundId], references: [id])
+}
