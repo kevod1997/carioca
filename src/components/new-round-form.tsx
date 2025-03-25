@@ -1,3 +1,4 @@
+// src/components/new-round-form.tsx (actualizado)
 // src/components/new-round-form.tsx
 "use client";
 
@@ -24,6 +25,7 @@ export function NewRoundForm({ gameId, players, roundNumber }: NewRoundFormProps
   const [scores, setScores] = useState<Record<number, string>>(
     Object.fromEntries(players.map(player => [player.id, ""]))
   );
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   // Función para obtener la descripción de la mano
@@ -46,6 +48,7 @@ export function NewRoundForm({ gameId, players, roundNumber }: NewRoundFormProps
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     
     // Convertir los valores a números y validar
     const numericScores: Record<number, number> = {};
@@ -61,7 +64,10 @@ export function NewRoundForm({ gameId, players, roundNumber }: NewRoundFormProps
       numericScores[parseInt(playerIdStr)] = numValue;
     }
     
-    if (hasError) return;
+    if (hasError) {
+      setIsLoading(false);
+      return;
+    }
 
     try {
       const response = await fetch("/api/scores", {
@@ -85,6 +91,8 @@ export function NewRoundForm({ gameId, players, roundNumber }: NewRoundFormProps
     } catch (error) {
       console.error("Error:", error);
       alert("Ocurrió un error al guardar las puntuaciones");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -107,12 +115,13 @@ export function NewRoundForm({ gameId, players, roundNumber }: NewRoundFormProps
                 onChange={(e) => handleScoreChange(player.id, e.target.value)}
                 placeholder="Puntos"
                 required
+                disabled={isLoading}
               />
             </div>
           ))}
         </CardContent>
         <CardFooter>
-          <Button type="submit" className="w-full">
+          <Button type="submit" className="w-full" isLoading={isLoading}>
             Guardar Puntuaciones
           </Button>
         </CardFooter>

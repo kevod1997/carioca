@@ -1,5 +1,4 @@
-// src/components/new-game-form.tsx - versión actualizada
-"use client";
+"use client"; 
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -23,6 +22,7 @@ export function NewGameForm() {
   ]);
   const [existingPlayers, setExistingPlayers] = useState<Player[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
   // Cargar jugadores existentes
@@ -73,12 +73,14 @@ export function NewGameForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     
     // Validar jugadores
     const validPlayers = selectedPlayers.filter(p => p.name.trim() !== "");
     
     if (validPlayers.length < 3) {
       alert("Se necesitan al menos 3 jugadores");
+      setIsSubmitting(false);
       return;
     }
     
@@ -86,6 +88,7 @@ export function NewGameForm() {
     const playerNames = validPlayers.map(p => p.name.trim());
     if (new Set(playerNames).size !== playerNames.length) {
       alert("No puede haber nombres de jugadores duplicados");
+      setIsSubmitting(false);
       return;
     }
 
@@ -110,6 +113,8 @@ export function NewGameForm() {
     } catch (error) {
       console.error("Error:", error);
       alert("Ocurrió un error al crear el juego");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -127,6 +132,7 @@ export function NewGameForm() {
               value={gameName}
               onChange={(e) => setGameName(e.target.value)}
               placeholder="Partida de Carioca"
+              disabled={isSubmitting}
             />
           </div>
           
@@ -146,7 +152,7 @@ export function NewGameForm() {
                     placeholder={`Buscar o crear jugador ${index + 1}`}
                     createOption={true}
                     inputValue={player.name}
-                    disabled={isLoading}
+                    disabled={isLoading || isSubmitting}
                   />
                 </div>
                 {selectedPlayers.length > 3 && (
@@ -155,6 +161,7 @@ export function NewGameForm() {
                     variant="outline" 
                     size="icon" 
                     onClick={() => removePlayer(index)}
+                    disabled={isSubmitting}
                   >
                     ✕
                   </Button>
@@ -168,6 +175,7 @@ export function NewGameForm() {
                 variant="outline"
                 className="w-full mt-2"
                 onClick={addPlayer}
+                disabled={isSubmitting}
               >
                 Añadir Jugador
               </Button>
@@ -175,8 +183,10 @@ export function NewGameForm() {
           </div>
         </CardContent>
         <CardFooter>
-          <Button type="submit" className="w-full">
-            Comenzar Juego
+          <Button type="submit" className="w-full" isLoading={isSubmitting}>
+           {
+              isSubmitting ? "Creando la partida..." : "Empezar Juego"
+           }
           </Button>
         </CardFooter>
       </form>

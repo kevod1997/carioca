@@ -1,7 +1,5 @@
 // src/app/players/page.tsx (versión optimizada)
 import { prisma } from "@/lib/db";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import {
     Table,
     TableBody,
@@ -11,6 +9,7 @@ import {
     TableRow
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { NavigateButton } from "@/components/ui/navigate-button";
 
 export default async function PlayersPage() {
     // Obtener jugadores con estadísticas ya calculadas
@@ -19,8 +18,6 @@ export default async function PlayersPage() {
             name: "asc",
         },
     });
-
-    console.log(players);
 
     // Procesar estadísticas
     const playerStats = players.map(player => {
@@ -49,9 +46,9 @@ export default async function PlayersPage() {
         <main className="container mx-auto py-8 px-4">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold">Estadísticas de Jugadores</h1>
-                <Link href="/">
-                    <Button variant="outline">Volver al inicio</Button>
-                </Link>
+                <NavigateButton href="/" variant="outline">
+                    Volver al inicio
+                </NavigateButton>
             </div>
 
             <Card>

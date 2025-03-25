@@ -1,6 +1,4 @@
 import { prisma } from "@/lib/db";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import {
     Table,
     TableBody,
@@ -11,6 +9,7 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { NavigateButton } from "@/components/ui/navigate-button";
 
 export default async function HistoryPage() {
     const games = await prisma.game.findMany({
@@ -27,11 +26,10 @@ export default async function HistoryPage() {
         <main className="container mx-auto py-8 px-4">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold">Historial de Partidas</h1>
-                <Link href="/">
-                    <Button variant="outline">Volver al inicio</Button>
-                </Link>
+                <NavigateButton href="/" variant="outline">
+                    Volver al inicio
+                </NavigateButton>
             </div>
-
             <Card>
                 <CardHeader>
                     <CardTitle>Todas las partidas</CardTitle>
@@ -76,11 +74,9 @@ export default async function HistoryPage() {
                                         )}
                                     </TableCell>
                                     <TableCell>
-                                        <Link href={`/partidas/${game.id}`}>
-                                            <Button variant="ghost" size="sm">
+                                        <NavigateButton href={`/partidas/${game.id}`} variant="ghost" size="sm">
                                                 Ver detalles
-                                            </Button>
-                                        </Link>
+                                        </NavigateButton>
                                     </TableCell>
                                 </TableRow>
                             ))}

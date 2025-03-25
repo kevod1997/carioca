@@ -3,6 +3,7 @@ import { NewGameForm } from "@/components/new-game-form";
 import { prisma } from "@/lib/db";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { NavigateButton } from "@/components/ui/navigate-button";
 
 export default async function Home() {
   const activeGames = await prisma.game.findMany({
@@ -54,20 +55,16 @@ export default async function Home() {
           )}
 
           <div className="mt-6">
-            <Link href="/historial">
-              <Button variant="outline" className="w-full">
-                Ver Historial de Partidas
-              </Button>
-            </Link>
+            <NavigateButton href="/historial" variant="outline" className="w-full">
+              Ver Historial de Partidas
+            </NavigateButton>
           </div>
         </div>
       </div>
       <div className="mt-4">
-        <Link href="/jugadores">
-          <Button variant="outline" className="w-full">
-            Ver Estadísticas de Jugadores
-          </Button>
-        </Link>
+        <NavigateButton href="/jugadores" variant="outline" className="w-full">
+          Ver Estadísticas de Jugadores
+        </NavigateButton>
       </div>
     </main>
   );

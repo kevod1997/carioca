@@ -1,10 +1,9 @@
 // src/app/partidas/[id]/page.tsx
 import { redirect } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { ScoreTable } from "@/components/score-table";
 import { prisma } from "@/lib/db";
-import Link from "next/link";
-import { FinishGameButton } from "@/components/finish-game.button";
+import { NavigateButton } from "@/components/ui/navigate-button";
+import { GameActions } from "@/components/game-actions";
 
 export default async function GamePage({ params }: { params: Promise<{ id: string }> }) {
   // Esperar a que params se resuelva antes de acceder a sus propiedades
@@ -67,47 +66,34 @@ export default async function GamePage({ params }: { params: Promise<{ id: strin
 
   return (
     <main className="container mx-auto py-8 px-4">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-2xl font-bold">
-            {game.name || `Partida del ${new Date(game.createdAt).toLocaleDateString()}`}
-          </h1>
-          {!isGameActive && (
-            <span className="inline-block mt-1 px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded-md">
-              Partida finalizada el {game.completedAt ? new Date(game.completedAt).toLocaleDateString() : ""}
-            </span>
-          )}
-        </div>
-        <Link href="/">
-          <Button variant="outline">Volver al inicio</Button>
-        </Link>
+    <div className="flex justify-between items-center mb-6">
+      <div>
+        <h1 className="text-2xl font-bold">
+          {game.name || `Partida del ${new Date(game.createdAt).toLocaleDateString()}`}
+        </h1>
+        {!isGameActive && (
+          <span className="inline-block mt-1 px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded-md">
+            Partida finalizada el {game.completedAt ? new Date(game.completedAt).toLocaleDateString() : ""}
+          </span>
+        )}
       </div>
+      <NavigateButton href="/" variant="outline">
+        Volver al inicio
+      </NavigateButton>
+    </div>
 
-      <ScoreTable
-        players={players}
-        rounds={game.rounds}
-        scores={adaptedScores}
-      />
+    <ScoreTable
+      players={players}
+      rounds={game.rounds}
+      scores={adaptedScores}
+    />
 
-      {nextRoundNumber ? (
-        <div className="mt-6 text-center">
-          <Link href={`/partidas/${gameId}/new-round?roundNumber=${nextRoundNumber}`}>
-            <Button>
-              Registrar Puntuaciones Mano {nextRoundNumber}
-            </Button>
-          </Link>
-        </div>
-      ) : (
-        <div className="mt-6 p-4 bg-green-100 rounded-lg text-center">
-          <h2 className="text-xl font-semibold text-green-800">
-            ¡Juego Completado!
-          </h2>
-          <p className="mt-2">
-            Todas las manos han sido jugadas. Revise las puntuaciones finales.
-          </p>
-          {isGameActive && <FinishGameButton gameId={gameId} />}
-        </div>
-      )}
-    </main>
+    {/* Reemplazar la lógica condicional con el nuevo componente */}
+    <GameActions 
+      gameId={gameId}
+      nextRoundNumber={nextRoundNumber}
+      isGameActive={isGameActive}
+    />
+  </main>
   );
 }
