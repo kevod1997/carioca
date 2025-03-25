@@ -1,4 +1,5 @@
-// src/app/page.tsx - versión actualizada
+export const dynamic = 'force-dynamic';
+
 import { NewGameForm } from "@/components/new-game-form";
 import { prisma } from "@/lib/db";
 import Link from "next/link";

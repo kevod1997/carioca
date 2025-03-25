@@ -1,4 +1,5 @@
-// src/app/api/games/route.ts - versión actualizada
+export const dynamic = 'force-dynamic';
+
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 

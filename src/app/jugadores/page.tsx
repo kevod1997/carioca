@@ -1,4 +1,5 @@
-// src/app/players/page.tsx (versión optimizada)
+export const dynamic = 'force-dynamic';
+
 import { prisma } from "@/lib/db";
 import {
     Table,

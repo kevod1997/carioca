@@ -1,4 +1,5 @@
-// src/app/partidas/[id]/page.tsx
+export const dynamic = 'force-dynamic';
+
 import { redirect } from "next/navigation";
 import { ScoreTable } from "@/components/score-table";
 import { prisma } from "@/lib/db";
