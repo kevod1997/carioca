@@ -1,51 +1,90 @@
 export const dynamic = 'force-dynamic';
 
-export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const gameId = parseInt(id);
+import { redirect } from "next/navigation";
+import { ScoreTable } from "@/components/score-table";
+import { prisma } from "@/lib/db";
+import { NavigateButton } from "@/components/ui/navigate-button";
+import { GameActions } from "@/components/game-actions";
+import type { Metadata } from 'next'
+
+type Props = {
+  params: { id: string }
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const gameId = parseInt(params.id);
+
+  if (isNaN(gameId)) {
+    return {
+      title: 'Partida no encontrada',
+      description: 'La partida especificada no existe'
+    };
+  }
 
   try {
     const game = await prisma.game.findUnique({
       where: { id: gameId },
-      include: { gameParticipants: { include: { player: true } } },
+      include: { 
+        gameParticipants: { 
+          include: { player: true } 
+        },
+        winner: true
+      },
     });
 
-    const gameName = game?.name || `Partida ${gameId}`;
-    const playerNames = game?.gameParticipants.map(gp => gp.player.name).join(", ");
+    if (!game) {
+      return {
+        title: 'Partida no encontrada',
+        description: 'La partida especificada no existe'
+      };
+    }
+
+    const gameName = game.name || `Partida ${gameId}`;
+    const playerNames = game.gameParticipants.map(gp => gp.player.name).join(", ");
+    const isActive = game.isActive;
+    const winnerName = game.winner?.name;
     
-    const ogImageUrl = new URL(`/api/og`, 'https://carioca.vercel.app');
+    // Construir URL de OG
+    const baseUrl = 'https://carioca.vercel.app';
+    const ogImageUrl = new URL(`/api/og`, baseUrl);
+    
+    // Pasar información para la imagen OG
     ogImageUrl.searchParams.set('title', gameName);
     ogImageUrl.searchParams.set('subtitle', `Jugadores: ${playerNames}`);
+    ogImageUrl.searchParams.set('status', isActive ? 'active' : 'completed');
+    if (winnerName) {
+      ogImageUrl.searchParams.set('winner', winnerName);
+    }
 
     return {
-      title: `${gameName}`,
-      description: `Detalles de la partida de Carioca entre ${playerNames}`,
+      title: gameName,
+      description: `Detalles de la partida de Carioca entre ${playerNames}${!isActive ? ` - Ganador: ${winnerName || "No determinado"}` : ""}`,
       openGraph: {
+        title: gameName,
+        description: `Partida de Carioca entre ${playerNames}`,
         images: [{
           url: ogImageUrl.toString(),
           width: 1200,
           height: 630,
           alt: gameName,
         }],
+        type: 'website',
       },
       twitter: {
+        card: 'summary_large_image',
+        title: gameName,
+        description: `Partida de Carioca entre ${playerNames}`,
         images: [ogImageUrl.toString()],
       },
     };
   } catch (error) {
-    console.error(error);
+    console.error("Error generando metadatos:", error);
     return {
       title: `Detalles de Partida`,
       description: `Información detallada de la partida de Carioca`,
     };
   }
 }
-
-import { redirect } from "next/navigation";
-import { ScoreTable } from "@/components/score-table";
-import { prisma } from "@/lib/db";
-import { NavigateButton } from "@/components/ui/navigate-button";
-import { GameActions } from "@/components/game-actions";
 
 export default async function GamePage({ params }: { params: Promise<{ id: string }> }) {
   // Esperar a que params se resuelva antes de acceder a sus propiedades
