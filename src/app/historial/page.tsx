@@ -1,5 +1,10 @@
 export const dynamic = 'force-dynamic';
 
+export const metadata = {
+    title: 'Historial de Partidas',
+    description: 'Consulta el historial completo de partidas de Carioca y sus resultados',
+  };
+
 import { prisma } from "@/lib/db";
 import {
     Table,

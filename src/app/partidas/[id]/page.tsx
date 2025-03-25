@@ -1,5 +1,46 @@
 export const dynamic = 'force-dynamic';
 
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const gameId = parseInt(id);
+
+  try {
+    const game = await prisma.game.findUnique({
+      where: { id: gameId },
+      include: { gameParticipants: { include: { player: true } } },
+    });
+
+    const gameName = game?.name || `Partida ${gameId}`;
+    const playerNames = game?.gameParticipants.map(gp => gp.player.name).join(", ");
+    
+    const ogImageUrl = new URL(`/api/og`, 'https://carioca.vercel.app');
+    ogImageUrl.searchParams.set('title', gameName);
+    ogImageUrl.searchParams.set('subtitle', `Jugadores: ${playerNames}`);
+
+    return {
+      title: `${gameName}`,
+      description: `Detalles de la partida de Carioca entre ${playerNames}`,
+      openGraph: {
+        images: [{
+          url: ogImageUrl.toString(),
+          width: 1200,
+          height: 630,
+          alt: gameName,
+        }],
+      },
+      twitter: {
+        images: [ogImageUrl.toString()],
+      },
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      title: `Detalles de Partida`,
+      description: `Información detallada de la partida de Carioca`,
+    };
+  }
+}
+
 import { redirect } from "next/navigation";
 import { ScoreTable } from "@/components/score-table";
 import { prisma } from "@/lib/db";

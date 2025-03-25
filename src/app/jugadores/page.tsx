@@ -1,5 +1,10 @@
 export const dynamic = 'force-dynamic';
 
+export const metadata = {
+    title: 'Estadísticas de Jugadores',
+    description: 'Revisa las estadísticas detalladas de todos los jugadores de Carioca',
+  };
+
 import { prisma } from "@/lib/db";
 import {
     Table,

@@ -1,5 +1,10 @@
 export const dynamic = 'force-dynamic';
 
+export const metadata = {
+  title: 'Inicio',
+  description: 'Crea nuevas partidas de Carioca y registra tus puntuaciones',
+};
+
 import { NewGameForm } from "@/components/new-game-form";
 import { prisma } from "@/lib/db";
 import Link from "next/link";
