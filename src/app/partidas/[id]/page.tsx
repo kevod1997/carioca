@@ -8,11 +8,14 @@ import { GameActions } from "@/components/game-actions";
 import type { Metadata } from 'next'
 
 type Props = {
-  params: { id: string }
+  params: Promise<{ id: string }>
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const gameId = parseInt(params.id);
+  // Esperar a que params se resuelva
+  const resolvedParams = await params;
+  const gameId = parseInt(resolvedParams.id);
 
   if (isNaN(gameId)) {
     return {
@@ -24,9 +27,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
     const game = await prisma.game.findUnique({
       where: { id: gameId },
-      include: { 
-        gameParticipants: { 
-          include: { player: true } 
+      include: {
+        gameParticipants: {
+          include: { player: true }
         },
         winner: true
       },
@@ -43,11 +46,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const playerNames = game.gameParticipants.map(gp => gp.player.name).join(", ");
     const isActive = game.isActive;
     const winnerName = game.winner?.name;
-    
+
     // Construir URL de OG
     const baseUrl = 'https://carioca.vercel.app';
     const ogImageUrl = new URL(`/api/og`, baseUrl);
-    
+
     // Pasar información para la imagen OG
     ogImageUrl.searchParams.set('title', gameName);
     ogImageUrl.searchParams.set('subtitle', `Jugadores: ${playerNames}`);
@@ -85,7 +88,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 }
-
 export default async function GamePage({ params }: { params: Promise<{ id: string }> }) {
   // Esperar a que params se resuelva antes de acceder a sus propiedades
   const { id } = await params;
@@ -147,34 +149,34 @@ export default async function GamePage({ params }: { params: Promise<{ id: strin
 
   return (
     <main className="container mx-auto py-8 px-4">
-    <div className="flex justify-between items-center mb-6">
-      <div>
-        <h1 className="text-2xl font-bold">
-          {game.name || `Partida del ${new Date(game.createdAt).toLocaleDateString()}`}
-        </h1>
-        {!isGameActive && (
-          <span className="inline-block mt-1 px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded-md">
-            Partida finalizada el {game.completedAt ? new Date(game.completedAt).toLocaleDateString() : ""}
-          </span>
-        )}
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="text-2xl font-bold">
+            {game.name || `Partida del ${new Date(game.createdAt).toLocaleDateString()}`}
+          </h1>
+          {!isGameActive && (
+            <span className="inline-block mt-1 px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded-md">
+              Partida finalizada el {game.completedAt ? new Date(game.completedAt).toLocaleDateString() : ""}
+            </span>
+          )}
+        </div>
+        <NavigateButton href="/" variant="outline">
+          Volver al inicio
+        </NavigateButton>
       </div>
-      <NavigateButton href="/" variant="outline">
-        Volver al inicio
-      </NavigateButton>
-    </div>
 
-    <ScoreTable
-      players={players}
-      rounds={game.rounds}
-      scores={adaptedScores}
-    />
+      <ScoreTable
+        players={players}
+        rounds={game.rounds}
+        scores={adaptedScores}
+      />
 
-    {/* Reemplazar la lógica condicional con el nuevo componente */}
-    <GameActions 
-      gameId={gameId}
-      nextRoundNumber={nextRoundNumber}
-      isGameActive={isGameActive}
-    />
-  </main>
+      {/* Reemplazar la lógica condicional con el nuevo componente */}
+      <GameActions
+        gameId={gameId}
+        nextRoundNumber={nextRoundNumber}
+        isGameActive={isGameActive}
+      />
+    </main>
   );
 }
