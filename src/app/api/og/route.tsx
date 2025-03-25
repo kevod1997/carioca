@@ -3,7 +3,6 @@ import { ImageResponse } from '@vercel/og';
  
 export const runtime = 'edge';
 
-// Función auxiliar para truncar texto largo
 function truncateText(text: string, maxLength: number) {
   return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
 }
@@ -14,6 +13,10 @@ export async function GET(request: Request) {
   const subtitle = searchParams.get('subtitle') || 'Registra tus puntuaciones fácilmente';
   const status = searchParams.get('status') || 'active';
   const winner = searchParams.get('winner') || '';
+  
+  // Obtener la URL base para referencias a imágenes
+  const url = new URL(request.url);
+  const baseUrl = `${url.protocol}//${url.host}`;
   
   // Colores personalizados
   const colors = {
@@ -60,7 +63,7 @@ export async function GET(request: Request) {
           background: 'rgba(255, 255, 255, 0.1)',
         }} />
         
-        {/* Logo y cartas estilizadas */}
+        {/* Logo con imagen desde carpeta public */}
         <div style={{
           position: 'absolute',
           top: '20px',
@@ -71,23 +74,15 @@ export async function GET(request: Request) {
           display: 'flex',
           alignItems: 'center',
         }}>
-          <div style={{
-            width: '40px',
-            height: '50px',
-            background: 'white',
-            borderRadius: '4px',
-            marginRight: '10px',
-            position: 'relative',
-            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'red',
-            fontSize: '20px',
-            fontWeight: 'bold',
-          }}>
-            A
-          </div>
+          <img 
+            src={`${baseUrl}/apple-touch-icon.png`}
+            width="50" 
+            height="50"
+            style={{
+              marginRight: '16px',
+              borderRadius: '8px',
+            }}
+          />
           Carioca Scorekeeper
         </div>
         
@@ -119,6 +114,22 @@ export async function GET(request: Request) {
             boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)',
           }}
         >
+          {/* Logo grande */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            marginBottom: '24px',
+          }}>
+            <img 
+              src={`${baseUrl}/favicon-32x32.png`}
+              width="100" 
+              height="100"
+              style={{
+                borderRadius: '12px',
+              }}
+            />
+          </div>
+          
           <div style={{ 
             fontSize: '72px', 
             fontWeight: 'bold', 
@@ -164,14 +175,20 @@ export async function GET(request: Request) {
           )}
         </div>
         
-        {/* Footer */}
+        {/* Footer con iconos de naipes */}
         <div style={{
           position: 'absolute',
           bottom: '20px',
+          display: 'flex',
+          alignItems: 'center',
           fontSize: '20px',
           color: 'rgba(255, 255, 255, 0.7)',
         }}>
-          carioca.vercel.app
+          <span style={{ marginRight: '8px' }}>♠️</span>
+          <span style={{ marginRight: '8px' }}>♥️</span>
+          <span style={{ marginRight: '8px' }}>♦️</span>
+          <span style={{ marginRight: '8px' }}>♣️</span>
+          <span>carioca.vercel.app</span>
         </div>
       </div>
     ),
