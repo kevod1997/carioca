@@ -1,5 +1,6 @@
 // src/app/api/og/route.tsx
 import { ImageResponse } from '@vercel/og';
+import Image from 'next/image';
  
 export const runtime = 'edge';
 
@@ -74,8 +75,9 @@ export async function GET(request: Request) {
           display: 'flex',
           alignItems: 'center',
         }}>
-          <img 
+          <Image 
             src={`${baseUrl}/apple-touch-icon.png`}
+            alt="Apple touch icon"
             width="50" 
             height="50"
             style={{
@@ -120,8 +122,9 @@ export async function GET(request: Request) {
             justifyContent: 'center',
             marginBottom: '24px',
           }}>
-            <img 
+            <Image 
               src={`${baseUrl}/favicon-32x32.png`}
+              alt="Favicon"
               width="100" 
               height="100"
               style={{

@@ -13,7 +13,7 @@ type CurrentDealerProps = {
   nextRoundNumber: number | null;
 };
 
-export function CurrentDealer({ players, completedRounds, nextRoundNumber }: CurrentDealerProps) {
+export function CurrentDealer({ players , nextRoundNumber }: CurrentDealerProps) {
   // Si no hay orden de repartida o no hay próxima ronda, no mostramos nada
   if (!players.some(p => p.dealOrder) || !nextRoundNumber) {
     return null;

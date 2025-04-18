@@ -205,6 +205,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Combobox } from "@/components/ui/combobox";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import { DropResult } from "@hello-pangea/dnd";
 
 type Player = {
   id: number;
@@ -270,10 +271,10 @@ export function NewGameForm() {
   };
 
   // Función para reordenar la lista cuando se arrastra un jugador
-  const onDragEnd = (result: any) => {
+  const onDragEnd = (result: DropResult): void => {
     if (!result.destination) return;
     
-    const items = Array.from(selectedPlayers);
+    const items: Array<{ id: number | null; name: string }> = Array.from(selectedPlayers);
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
     
