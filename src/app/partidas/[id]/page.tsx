@@ -6,6 +6,7 @@ import { prisma } from "@/lib/db";
 import { NavigateButton } from "@/components/ui/navigate-button";
 import { GameActions } from "@/components/game-actions";
 import type { Metadata } from 'next'
+import { CurrentDealer } from "@/components/current-dealer";
 
 type Props = {
   params: Promise<{ id: string }>
@@ -25,13 +26,27 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   try {
+    // const game = await prisma.game.findUnique({
+    //   where: { id: gameId },
+    //   include: {
+    //     gameParticipants: {
+    //       include: { player: true }
+    //     },
+    //     winner: true
+    //   },
+    // });
+
     const game = await prisma.game.findUnique({
       where: { id: gameId },
       include: {
         gameParticipants: {
-          include: { player: true }
+          include: { player: true },
+          orderBy: { dealOrder: "asc" } // Si ya has añadido este campo
         },
-        winner: true
+        rounds: {
+          orderBy: { roundNumber: "asc" },
+        },
+        winner: true // Añadir esta línea para incluir la relación winner
       },
     });
 
@@ -128,10 +143,16 @@ export default async function GamePage({ params }: { params: Promise<{ id: strin
   });
 
   // Preparar datos para el ScoreTable
+  // const players = game.gameParticipants.map(gp => ({
+  //   id: gp.playerId,
+  //   participantId: gp.id,
+  //   name: gp.player.name
+  // }));
   const players = game.gameParticipants.map(gp => ({
     id: gp.playerId,
     participantId: gp.id,
-    name: gp.player.name
+    name: gp.player.name,
+    dealOrder: gp.dealOrder // Incluimos el orden de repartida
   }));
 
   // Adaptar puntuaciones al formato esperado por ScoreTable
@@ -164,6 +185,12 @@ export default async function GamePage({ params }: { params: Promise<{ id: strin
           Volver al inicio
         </NavigateButton>
       </div>
+
+      <CurrentDealer
+        players={players}
+        completedRounds={game.rounds.length}
+        nextRoundNumber={nextRoundNumber}
+      />
 
       <ScoreTable
         players={players}

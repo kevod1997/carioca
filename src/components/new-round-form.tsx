@@ -8,11 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "./ui/badge";
 
 type Player = {
-  id: number; // ID del jugador
-  participantId: number; // ID del participante
+  id: number;
+  participantId: number;
   name: string;
+  dealOrder?: number;
 };
 
 type NewRoundFormProps = {
@@ -49,11 +51,11 @@ export function NewRoundForm({ gameId, players, roundNumber }: NewRoundFormProps
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     // Convertir los valores a números y validar
     const numericScores: Record<number, number> = {};
     let hasError = false;
-    
+
     for (const [playerIdStr, scoreValue] of Object.entries(scores)) {
       const numValue = parseInt(scoreValue);
       if (isNaN(numValue)) {
@@ -63,7 +65,7 @@ export function NewRoundForm({ gameId, players, roundNumber }: NewRoundFormProps
       }
       numericScores[parseInt(playerIdStr)] = numValue;
     }
-    
+
     if (hasError) {
       setIsLoading(false);
       return;
@@ -96,6 +98,31 @@ export function NewRoundForm({ gameId, players, roundNumber }: NewRoundFormProps
     }
   };
 
+  // Función para determinar quién reparte en la próxima ronda
+  const getNextDealer = () => {
+    if (!players.some(p => p.dealOrder)) return null;
+
+    // Ordenar jugadores por orden de repartida
+    const sortedPlayers = [...players].sort((a, b) =>
+      (a.dealOrder || 0) - (b.dealOrder || 0)
+    );
+
+    // Calcular la próxima ronda
+    const nextRoundNumber = roundNumber + 1;
+
+    // Si ya estamos en la última ronda, no hay próximo repartidor
+    if (nextRoundNumber > 7) return null;
+
+    // El índice del próximo repartidor
+    const nextDealerIndex = (nextRoundNumber - 1) % sortedPlayers.length;
+    return sortedPlayers[nextDealerIndex];
+  };
+
+  const nextDealer = getNextDealer();
+  const nextRoundNumber = roundNumber + 1;
+  const nextCardCount = 6 + nextRoundNumber; // Cartas para la próxima ronda
+
+
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
@@ -103,6 +130,16 @@ export function NewRoundForm({ gameId, players, roundNumber }: NewRoundFormProps
           Puntuaciones Mano {roundNumber}: {getRoundDescription(roundNumber)}
         </CardTitle>
       </CardHeader>
+      {nextDealer && nextRoundNumber <= 7 && (
+        <div className="mt-2 text-center mb-4">
+          <Badge variant="outline" className="bg-green-50 text-green-800 mr-2">
+            Próximo repartidor: {nextDealer.name}
+          </Badge>
+          <Badge variant="outline" className="bg-indigo-100 text-indigo-800">
+            {nextCardCount} cartas
+          </Badge>
+        </div>
+      )}
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
           {players.map((player) => (

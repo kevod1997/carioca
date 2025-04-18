@@ -33,12 +33,13 @@ model Player {
 }
 
 model GameParticipant {
-  id       Int     @id @default(autoincrement())
-  playerId Int
-  gameId   Int
-  player   Player  @relation(fields: [playerId], references: [id])
-  game     Game    @relation(fields: [gameId], references: [id])
-  scores   Score[]
+  id        Int     @id @default(autoincrement())
+  playerId  Int
+  gameId    Int
+  dealOrder Int     @default(0) // Nuevo campo para el orden de repartida
+  player    Player  @relation(fields: [playerId], references: [id])
+  game      Game    @relation(fields: [gameId], references: [id])
+  scores    Score[]
 
   @@unique([playerId, gameId])
 }

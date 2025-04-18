@@ -33,10 +33,16 @@ export default async function NewRoundPage({
   }
 
   // Preparar jugadores para el formulario
+  // const players = gameParticipants.map(gp => ({
+  //   id: gp.playerId,  // Usamos el ID del jugador para compatibilidad
+  //   participantId: gp.id, // Añadimos el ID de participante
+  //   name: gp.player.name
+  // }));
   const players = gameParticipants.map(gp => ({
-    id: gp.playerId,  // Usamos el ID del jugador para compatibilidad
-    participantId: gp.id, // Añadimos el ID de participante
-    name: gp.player.name
+    id: gp.playerId,
+    participantId: gp.id,
+    name: gp.player.name,
+    dealOrder: gp.dealOrder // Incluir el orden de repartida
   }));
 
   return (

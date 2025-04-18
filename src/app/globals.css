@@ -120,3 +120,19 @@
     @apply bg-background text-foreground;
   }
 }
+
+.dealer-cell {
+  @apply bg-blue-50;
+}
+
+@media (max-width: 768px) {
+  .description-cell {
+    @apply max-w-[120px];
+    white-space: normal;
+    word-break: break-word;
+  }
+  
+  .round-badge {
+    @apply text-xs py-0.5 px-1;
+  }
+}
